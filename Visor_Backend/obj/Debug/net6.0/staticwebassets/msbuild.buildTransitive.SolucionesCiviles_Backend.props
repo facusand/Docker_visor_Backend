@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\buildMultiTargeting\SolucionesCiviles_Backend.props" />
+</Project>

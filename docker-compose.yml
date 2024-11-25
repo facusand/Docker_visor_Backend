@@ -1,0 +1,42 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "YourStrong!Passw0rd"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    networks:
+      - mi_red
+
+  visor_backend:
+    build:
+      context: .
+      dockerfile: Visor_Backend/Dockerfile
+    ports:
+      - "7073:7073"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Connection=Server=db;Database=NombreDeTuBaseDeDatos;User=sa;Password=YourStrong!Passw0rd;
+    networks:
+      - mi_red
+    depends_on:
+      - db
+
+  migrations:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    build:
+      context: .
+      dockerfile: Visor_Backend/Dockerfile
+    command: dotnet ef database update --project DB/DB.csproj
+    environment:
+      - ConnectionStrings__Connection=Server=db;Database=NombreDeTuBaseDeDatos;User=sa;Password=YourStrong!Passw0rd;
+    networks:
+      - mi_red
+    depends_on:
+      - db
+
+networks:
+  mi_red:
+    driver: bridge
+
